@@ -1,0 +1,23 @@
+package net.ArcaneArtificer.arcanevillagers.event;
+
+import net.ArcaneArtificer.arcanevillagers.ArcaneVillagers;
+import net.ArcaneArtificer.arcanevillagers.event.loot.WorkstationFromPiglinBarteringAdditionModifier;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraftforge.common.loot.GlobalLootModifierSerializer;
+import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
+
+import javax.annotation.Nonnull;
+
+@Mod.EventBusSubscriber(modid = ArcaneVillagers.MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD)
+public class ModEventBusEvents {
+    @SubscribeEvent
+    public static void registerModifierSerializers(@Nonnull final RegistryEvent.Register<GlobalLootModifierSerializer<?>> event) {
+        event.getRegistry().registerAll(
+                new WorkstationFromPiglinBarteringAdditionModifier.Serializer().setRegistryName
+                        (new ResourceLocation(ArcaneVillagers.MOD_ID, "workstation_from_piglin"))
+        );
+    }
+
+}
