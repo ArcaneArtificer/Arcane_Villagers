@@ -22,7 +22,9 @@ import net.minecraft.world.level.ItemLike;
 import net.minecraftforge.event.village.VillagerTradesEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraftforge.registries.RegistryObject;
 import org.apache.commons.lang3.ArrayUtils;
 
 import javax.annotation.Nonnull;
@@ -35,6 +37,8 @@ public class ModEvents {
     private static final float CHEAP_TO_EXPENSIVE_THRESHOLD = 56f / 64f;
     private static final Integer[][] SCALED_QUANTITIES = new Integer[65][65];
     private static final float[] BIAS = { -1f, -0.7f, -0.4f, -0.15f, 0f, 0.1f, 0.18f, 0.25f, 0.32f, 0.4f};
+    private static final Map<String, VillagerProfession> VANILLA_PROFESSIONS = new HashMap<>();
+    private static final Map<String, RegistryObject<VillagerProfession>> ARCANE_PROFESSIONS = new HashMap<>();
     private static ArrayList<Enchantment> ALL_ENCHANTS = new ArrayList<>();
     private static Map<VillagerProfession, ArrayList<Enchantment>> LVL_1_PROFESSION_TO_ENCHANTMENTS = new HashMap<>();
     private static Map<VillagerProfession, ArrayList<Enchantment>> LVL_2_PROFESSION_TO_ENCHANTMENTS = new HashMap<>();
@@ -383,15 +387,33 @@ public class ModEvents {
                     MYTHICAL(6),
                     ARCANIC(7);
                      */
-                    Map<Integer, ArrayList<VillagerProfession>> trade_options = ((ArcanicEnchant) enchantment).getProfessionTrades();
-                    trade_options.forEach((trade_level, professions) -> {
-                        professions.forEach(profession -> {
-                            switch (trade_level) {
-                                case 1 -> {LVL_1_PROFESSION_TO_ENCHANTMENTS.get(profession).add(enchantment);}
-                                case 2 -> {LVL_2_PROFESSION_TO_ENCHANTMENTS.get(profession).add(enchantment);}
-                                case 3 -> {LVL_3_PROFESSION_TO_ENCHANTMENTS.get(profession).add(enchantment);}
-                                case 4 -> {LVL_4_PROFESSION_TO_ENCHANTMENTS.get(profession).add(enchantment);}
-                                case 5 -> {LVL_5_PROFESSION_TO_ENCHANTMENTS.get(profession).add(enchantment);}
+                    Map<Integer, ArrayList<String>> trade_options = ((ArcanicEnchant) enchantment).getProfessionTrades();
+                    trade_options.forEach((trade_level, professionNames) -> {
+                        professionNames.forEach(professionName -> {
+                            VillagerProfession profession = null;
+                            if (VANILLA_PROFESSIONS.containsKey(professionName)) {
+                                profession = VANILLA_PROFESSIONS.get(professionName);
+                            } else if (ARCANE_PROFESSIONS.containsKey(professionName)) {
+                                profession = ARCANE_PROFESSIONS.get(professionName).get();
+                            }
+                            if (profession != null) {
+                                switch (trade_level) {
+                                    case 1 -> {
+                                        LVL_1_PROFESSION_TO_ENCHANTMENTS.get(profession).add(enchantment);
+                                    }
+                                    case 2 -> {
+                                        LVL_2_PROFESSION_TO_ENCHANTMENTS.get(profession).add(enchantment);
+                                    }
+                                    case 3 -> {
+                                        LVL_3_PROFESSION_TO_ENCHANTMENTS.get(profession).add(enchantment);
+                                    }
+                                    case 4 -> {
+                                        LVL_4_PROFESSION_TO_ENCHANTMENTS.get(profession).add(enchantment);
+                                    }
+                                    case 5 -> {
+                                        LVL_5_PROFESSION_TO_ENCHANTMENTS.get(profession).add(enchantment);
+                                    }
+                                }
                             }
                         });
                     });
@@ -719,6 +741,24 @@ public class ModEvents {
                 }
             }
         }
+
+        VANILLA_PROFESSIONS.put("ARMORER", VillagerProfession.ARMORER);
+        VANILLA_PROFESSIONS.put("BUTCHER", VillagerProfession.BUTCHER);
+        VANILLA_PROFESSIONS.put("CARTOGRAPHER", VillagerProfession.CARTOGRAPHER);
+        VANILLA_PROFESSIONS.put("CLERIC", VillagerProfession.CLERIC);
+        VANILLA_PROFESSIONS.put("FARMER", VillagerProfession.FARMER);
+        VANILLA_PROFESSIONS.put("FISHERMAN", VillagerProfession.FISHERMAN);
+        VANILLA_PROFESSIONS.put("FLETCHER", VillagerProfession.FLETCHER);
+        VANILLA_PROFESSIONS.put("LEATHERWORKER", VillagerProfession.LEATHERWORKER);
+        VANILLA_PROFESSIONS.put("LIBRARIAN", VillagerProfession.LIBRARIAN);
+        VANILLA_PROFESSIONS.put("MASON", VillagerProfession.MASON);
+        VANILLA_PROFESSIONS.put("SHEPHERD", VillagerProfession.SHEPHERD);
+        VANILLA_PROFESSIONS.put("TOOLSMITH", VillagerProfession.TOOLSMITH);
+        VANILLA_PROFESSIONS.put("WEAPONSMITH", VillagerProfession.WEAPONSMITH);
+
+        ARCANE_PROFESSIONS.put("WIZARD", ModVillagers.WIZARD);
+        ARCANE_PROFESSIONS.put("JEWELER", ModVillagers.JEWELER);
+        ARCANE_PROFESSIONS.put("BASTION_PLUNDERER", ModVillagers.BASTION_PLUNDERER);
     }
 }
 
